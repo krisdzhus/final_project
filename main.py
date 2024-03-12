@@ -3,9 +3,11 @@ from collections import UserDict
 from datetime import datetime, timedelta
 
 class PhoneValidationError(Exception):
+    """Exception raised for invalid phone number format."""
     pass
 
 class Field:
+    """Base class for fields."""
     def __init__(self, value):
         self.value = value
 
@@ -13,15 +15,18 @@ class Field:
         return str(self.value)
 
 class Name(Field):
+    """Class representing a name field."""
     pass
 
 class Phone(Field):
+    """Class representing a phone number field."""
     def __init__(self, value):
         if not value.isdigit() or len(value) != 10:
             raise PhoneValidationError("Please enter a valid number.")
         super().__init__(value)
 
 class Birthday(Field):
+    """Class representing a birthday field."""
     def __init__(self, value):
         try:
             datetime.strptime(value, "%d.%m.%Y")
@@ -30,15 +35,18 @@ class Birthday(Field):
         super().__init__(value)
 
 class Email(Field):
+    """Class representing an email field."""
     def __init__(self, value):
         if not re.match(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$', value):
             raise ValueError("Please enter a valid email address.")
         super().__init__(value)
 
 class Address(Field):
+    """Class representing an address field."""
     pass
 
 class Record:
+    """Class representing a contact record."""
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
@@ -93,6 +101,7 @@ class Record:
         return f"Contact name: {self.name.value}, phones: {phone_info}, emails: {email_info}, addresses: {address_info}, birthday: {birthday_info}"
 
 class AddressBook(UserDict):
+    """Class representing an address book."""
     def add_record(self, record):
         self.data[record.name.value] = record
 
@@ -126,6 +135,7 @@ class AddressBook(UserDict):
         return birthday_dict
 
 def input_error(func):
+    """Decorator to handle input errors."""
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -148,6 +158,7 @@ def parse_input(user_input):
 
 @input_error
 def add_contact(args, book):
+    """Add a contact to the address book."""
     name, phone, email, address = args
     record = Record(name)
     record.add_phone(phone)
@@ -157,6 +168,7 @@ def add_contact(args, book):
     return "Contact added."
 
 def change_phone(args, book):
+    """Change the phone number of a contact."""
     name, phone = args
     record = book.find(name)
     if record:
@@ -166,6 +178,7 @@ def change_phone(args, book):
         raise KeyError("Contact not found.")
     
 def change_email(args, book):
+    """Change the email of a contact."""
     name, email = args
     record = book.find(name)
     if record:
@@ -175,6 +188,7 @@ def change_email(args, book):
         raise KeyError("Contact not found.")
 
 def show_phone(args, book):
+    """Show the phone number of a contact."""
     name = args[0]
     record = book.find(name)
     if record:
@@ -183,9 +197,11 @@ def show_phone(args, book):
         raise KeyError("Contact not found.")
     
 def show_all(book):
+    """Show all contacts in the address book."""
     for record in book.data.values():
         print(record)
 
+# or
 # def show_all(book):
 #     contacts = []
 #     for record in book.data.values():
@@ -198,6 +214,7 @@ def show_all(book):
 #         print(contact)
    
 def add_birthday_handler(args, book):
+    """Add birthday to a contact."""
     name, birthday = args
     record = book.find(name)
     if record:
@@ -208,6 +225,7 @@ def add_birthday_handler(args, book):
 
 
 def show_birthday_handler(args, book):
+    """Show birthday of a contact."""
     name = args[0]
     record = book.find(name)
     if record and record.birthday:
@@ -216,6 +234,7 @@ def show_birthday_handler(args, book):
         print("Birthday not found")
 
 def birthdays_handler(book):
+    """Show upcoming birthdays."""
     birthdays_this_week = book.get_birthdays_per_week()
     if birthdays_this_week:
         print("Birthdays coming up this week:")
@@ -225,6 +244,7 @@ def birthdays_handler(book):
         print("No birthdays coming up this week")
 
 def search_by_name(args, book):
+    """Search contacts by name."""
     name = args[0]
     matching_contacts = []
     for record in book.data.values():
@@ -234,6 +254,7 @@ def search_by_name(args, book):
 
 
 def main():
+    """Main function to run the address book program."""
     book = AddressBook()
     print("Welcome to the assistant bot!")
     while True:
