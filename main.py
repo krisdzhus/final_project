@@ -75,11 +75,11 @@ class Record:
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
-    def edit_email(self, old_email, new_email):
-        for e in self.emails:
-            if e.value == old_email:
-                e.value = new_email
-                break
+    # def edit_email(self, old_email, new_email):
+    #     for e in self.emails:
+    #         if e.value == old_email:
+    #             e.value = new_email
+    #             break
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, emails: {'; '.join(e.value for e in self.emails)}, addresses: {'; '.join(a.value for a in self.addresses)}"
@@ -161,7 +161,7 @@ def change_email(args, book):
     name, email = args
     record = book.find(name)
     if record:
-        record.phones = [Email(email)]
+        record.email = [Email(email)]
         return "Contact updated"
     else:
         raise KeyError("Contact not found.")
