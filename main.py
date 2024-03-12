@@ -1,3 +1,4 @@
+import re
 from collections import UserDict
 from datetime import datetime, timedelta
 
@@ -29,7 +30,10 @@ class Birthday(Field):
         super().__init__(value)
 
 class Email(Field):
-    pass
+    def __init__(self, value):
+        if not re.match(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$', value):
+            raise ValueError("Please enter a valid email address.")
+        super().__init__(value)
 
 class Address(Field):
     pass
@@ -82,7 +86,11 @@ class Record:
     #             break
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, emails: {'; '.join(e.value for e in self.emails)}, addresses: {'; '.join(a.value for a in self.addresses)}"
+        phone_info = ', '.join(p.value for p in self.phones)
+        email_info = ', '.join(e.value for e in self.emails)
+        address_info = ', '.join(a.value for a in self.addresses)
+        birthday_info = self.birthday.value if self.birthday else "Not specified"
+        return f"Contact name: {self.name.value}, phones: {phone_info}, emails: {email_info}, addresses: {address_info}, birthday: {birthday_info}"
 
 class AddressBook(UserDict):
     def add_record(self, record):
@@ -173,17 +181,21 @@ def show_phone(args, book):
         return record.phones[0].value
     else:
         raise KeyError("Contact not found.")
-
+    
 def show_all(book):
-    contacts = []
     for record in book.data.values():
-        contact_info = f"Name: {record.name.value}\n"
-        contact_info += f"Phones: {', '.join(p.value for p in record.phones)}\n"
-        contact_info += f"Emails: {', '.join(e.value for e in record.emails)}\n"
-        contact_info += f"Addresses: {', '.join(a.value for a in record.addresses)}"
-        contacts.append(contact_info)
-    for contact in contacts:
-        print(contact)
+        print(record)
+
+# def show_all(book):
+#     contacts = []
+#     for record in book.data.values():
+#         contact_info = f"Name: {record.name.value}\n"
+#         contact_info += f"Phones: {', '.join(p.value for p in record.phones)}\n"
+#         contact_info += f"Emails: {', '.join(e.value for e in record.emails)}\n"
+#         contact_info += f"Addresses: {', '.join(a.value for a in record.addresses)}"
+#         contacts.append(contact_info)
+#     for contact in contacts:
+#         print(contact)
    
 def add_birthday_handler(args, book):
     name, birthday = args
